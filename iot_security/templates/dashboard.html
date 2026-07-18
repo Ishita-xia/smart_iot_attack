@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart IDS — IoT Security Admin Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-logo"><i class="fa-solid fa-shield-halved"></i></span>
+        <span class="brand-text">Smart IDS</span>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li>
+          <a class="menu-item active" data-tab="dashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="traffic">
+            <i class="fa-solid fa-satellite-dish"></i>
+            <span>Traffic Capture</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="detection">
+            <i class="fa-solid fa-microscope"></i>
+            <span>Detection Engine</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="filtering">
+            <i class="fa-solid fa-filter"></i>
+            <span>Traffic Filtering</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="federated">
+            <i class="fa-solid fa-globe"></i>
+            <span>Federated Learning</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="logs">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Log Analysis</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="alerts">
+            <i class="fa-solid fa-bell"></i>
+            <span>Alerts Center</span>
+          </a>
+        </li>
+        <li>
+          <a class="menu-item" data-tab="reports">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Reports & Analytics</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Sidebar Settings -->
+      <div class="sidebar-settings">
+        <div class="settings-heading">System Parameters</div>
+        <div class="setting-row">
+          <label for="max-rows-input">Max Rows Per Class</label>
+          <input type="number" id="max-rows-input" class="setting-control" value="1000" min="500" max="5000" step="500">
+        </div>
+        <div class="setting-row">
+          <button id="btn-load-dataset" class="btn btn-secondary" style="width:100%; padding: 8px;"><i class="fa-solid fa-arrows-rotate"></i> Load Dataset</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+      
+      <!-- ========================================== -->
+      <!-- TAB 1: OVERVIEW DASHBOARD -->
+      <!-- ========================================== -->
+      <section id="tab-dashboard" class="tab-content active">
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- HERO: Upload & Analyze — PRIMARY FEATURE  -->
+        <!-- ══════════════════════════════════════════ -->
+        <div class="upload-hero-panel" id="custom-evaluation-panel">
+
+          <!-- Header row -->
+          <div class="upload-hero-header">
+            <div>
+              <h1 class="upload-hero-title">
+                <i class="fa-solid fa-shield-halved"></i>
+                IoT Network Traffic Analyzer
+              </h1>
+              <p class="upload-hero-subtitle">Upload a CSV of network flows — the pre-trained CNN + Autoencoder pipeline will classify each row and detect threats in seconds</p>
+            </div>
+            <div class="upload-hero-badges">
+              <span class="model-badge"><i class="fa-solid fa-brain"></i> CNN · 69.4% acc</span>
+              <span class="model-badge ae"><i class="fa-solid fa-wave-square"></i> Autoencoder · 77.4% det.</span>
+              <span class="model-badge classes"><i class="fa-solid fa-tags"></i> 34 attack classes</span>
+            </div>
+          </div>
+
+          <!-- Upload + Results body -->
+          <div class="upload-hero-body">
+
+            <!-- LEFT: Drop zone -->
+            <div class="upload-dropzone-col">
+              <div class="file-upload-wrapper upload-dropzone-box" id="upload-dropzone">
+                <input type="file" id="eval-file-input" accept=".csv">
+                <i class="fa-solid fa-cloud-arrow-up upload-dropzone-icon"></i>
+                <span id="file-upload-text" class="upload-dropzone-label">Drag & drop or click to upload CSV</span>
+                <span class="upload-dropzone-hint">Supports any CSV with IoT network flow features</span>
+              </div>
+              <button id="btn-upload-eval" class="btn upload-analyze-btn">
+                <i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Traffic
+              </button>
+            </div>
+
+            <!-- RIGHT: Empty state -->
+            <div id="eval-empty-state" class="upload-empty-state">
+              <i class="fa-solid fa-chart-network upload-empty-icon"></i>
+              <h4 class="upload-empty-title">Awaiting Your Data</h4>
+              <p class="upload-empty-desc">Upload a CSV file of network traffic flows. The system will run each row through the full 9-stage IDS pipeline and show you which flows are benign, which are attacks, and which are zero-day anomalies.</p>
+              <div class="upload-empty-steps">
+                <div class="upload-step"><span class="upload-step-num">1</span> Upload a .csv file</div>
+                <div class="upload-step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="upload-step"><span class="upload-step-num">2</span> CNN + AE classify it</div>
+                <div class="upload-step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="upload-step"><span class="upload-step-num">3</span> Results appear here</div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Results (shown after upload) -->
+            <div id="eval-results-container" style="display:none; flex-direction:column; gap:20px;">
+
+              <!-- 4 stat cards -->
+              <div class="eval-stats-row">
+                <div class="eval-stat-card">
+                  <div class="eval-stat-label">Total Flows</div>
+                  <div id="eval-stat-total" class="eval-stat-value neutral">0</div>
+                </div>
+                <div class="eval-stat-card success-card">
+                  <div class="eval-stat-label">Benign</div>
+                  <div id="eval-stat-benign" class="eval-stat-value success">0</div>
+                </div>
+                <div class="eval-stat-card danger-card">
+                  <div class="eval-stat-label">Attacks Detected</div>
+                  <div id="eval-stat-attacks" class="eval-stat-value danger">0</div>
+                </div>
+                <div class="eval-stat-card warning-card">
+                  <div class="eval-stat-label">Anomalies (AE)</div>
+                  <div id="eval-stat-anomalies" class="eval-stat-value warning">0 <span id="eval-stat-anomaly-rate" style="font-size:11px; font-weight:400;">(0%)</span></div>
+                </div>
+              </div>
+
+              <!-- Breakdown + Sample table -->
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div class="eval-breakdown-box">
+                  <h4 class="eval-section-title">Attack Group Breakdown</h4>
+                  <div id="eval-distribution-list" style="display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:180px;">
+                  </div>
+                </div>
+                <div class="eval-breakdown-box">
+                  <h4 class="eval-section-title">Sample Predictions (first 5 rows)</h4>
+                  <div class="table-wrapper" style="margin-top:0; max-height:180px; overflow-y:auto;">
+                    <table class="custom-table" id="eval-sample-table" style="font-size:12px;">
+                      <thead>
+                        <tr>
+                          <th style="padding:6px 10px;">Row</th>
+                          <th style="padding:6px 10px;">Prediction</th>
+                          <th style="padding:6px 10px;">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- SECONDARY: System Monitoring              -->
+        <!-- ══════════════════════════════════════════ -->
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid" style="margin-top:30px;">
+          <div class="glass-panel metric-card primary">
+            <div class="details">
+              <h3>Total Logs</h3>
+              <div class="value" id="metric-total-logs">0</div>
+            </div>
+            <div class="icon-box"><i class="fa-solid fa-server"></i></div>
+          </div>
+          <div class="glass-panel metric-card danger">
+            <div class="details">
+              <h3>Active Alerts</h3>
+              <div class="value" id="metric-active-alerts">0</div>
+            </div>
+            <div class="icon-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          </div>
+          <div class="glass-panel metric-card warning">
+            <div class="details">
+              <h3>Blocked IPs</h3>
+              <div class="value" id="metric-blocked-ips">0</div>
+            </div>
+            <div class="icon-box"><i class="fa-solid fa-ban"></i></div>
+          </div>
+          <div class="glass-panel metric-card success">
+            <div class="details">
+              <h3>Models Ready</h3>
+              <div class="value" id="metric-dataset-status">No</div>
+            </div>
+            <div class="icon-box"><i class="fa-solid fa-microchip"></i></div>
+          </div>
+        </div>
+
+        <!-- Pipeline Flowchart + Decisions -->
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px; margin-top:30px;">
+
+          <!-- Pipeline decisions table -->
+          <div class="glass-panel chart-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3>Recent Pipeline Decisions</h3>
+              <button id="btn-run-pipeline" class="btn btn-secondary" style="font-size:13px; padding:7px 14px;">
+                <i class="fa-solid fa-play"></i> Simulate Live Traffic
+              </button>
+            </div>
+            <div class="table-wrapper">
+              <table class="custom-table" id="dashboard-decisions-table">
+                <thead>
+                  <tr>
+                    <th>Flow ID</th>
+                    <th>Source IP</th>
+                    <th>CNN Pred</th>
+                    <th>Anomaly</th>
+                    <th>Action</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="6" style="text-align:center; color:var(--text-dim);">Upload a CSV above or simulate live traffic to see decisions.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- IoT environment panel -->
+          <div class="glass-panel">
+            <h3>Live Simulation Config</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">For the "Simulate Live Traffic" button above</p>
+            <div class="form-group">
+              <label class="form-label" for="select-env">Environment</label>
+              <select id="select-env" class="form-select">
+                <option value="Smart Home">Smart Home</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Industrial Automation">Industrial Automation</option>
+                <option value="Smart City">Smart City</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="select-batch">Batch Size</label>
+              <select id="select-batch" class="form-select">
+                <option value="10">10 Flows</option>
+                <option value="30">30 Flows</option>
+                <option value="50" selected>50 Flows</option>
+                <option value="100">100 Flows</option>
+              </select>
+            </div>
+            <h4 style="font-size:13px; font-weight:600; color:#fff; margin-top:20px; margin-bottom:10px;">Active IoT Devices</h4>
+            <div class="device-grid" id="active-devices-grid"></div>
+          </div>
+        </div>
+
+        <!-- Flowchart status (collapsed, secondary) -->
+        <div class="flowchart-wrapper" style="margin-top:30px;">
+          <h3 style="font-size:14px; font-weight:600; color:var(--text-muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.05em;">
+            <i class="fa-solid fa-diagram-project" style="margin-right:6px;"></i> 9-Stage Pipeline Status
+          </h3>
+          <div class="flowchart-stages">
+            <div class="flowchart-stage" id="stage-1"><div class="stage-num">1</div><div class="stage-name">IoT Network</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-2"><div class="stage-num">2</div><div class="stage-name">Traffic Capture</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-3"><div class="stage-num">3</div><div class="stage-name">Preprocessing</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-4"><div class="stage-num">4</div><div class="stage-name">Detection Engine</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-5"><div class="stage-num">5</div><div class="stage-name">Federated Learning</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-6"><div class="stage-num">6</div><div class="stage-name">Traffic Filtering</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-7"><div class="stage-num">7</div><div class="stage-name">Log & Threat Intel</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-8"><div class="stage-num">8</div><div class="stage-name">Alerts & Notifs</div><span class="stage-status-dot"></span></div>
+            <div class="flowchart-stage" id="stage-9"><div class="stage-num">9</div><div class="stage-name">Dashboard</div><span class="stage-status-dot"></span></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 2: TRAFFIC CAPTURE -->
+      <!-- ========================================== -->
+      <section id="tab-traffic" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Traffic Capture</h1>
+          <p class="page-description">Simulate and examine raw IoT network traffic packets</p>
+        </div>
+        <div class="glass-panel">
+          <div class="dashboard-title-row">
+            <h3>Captured Packet Streams</h3>
+            <button id="btn-capture-batch" class="btn"><i class="fa-solid fa-satellite"></i> Capture Traffic Batch</button>
+          </div>
+          <div class="table-wrapper">
+            <table class="custom-table" id="traffic-table">
+              <thead>
+                <tr>
+                  <th>Flow ID</th>
+                  <th>Timestamp</th>
+                  <th>Source IP</th>
+                  <th>Destination IP</th>
+                  <th>Protocol</th>
+                  <th>Attack Ground Truth</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="6" style="text-align:center; color:var(--text-dim);">No traffic captured. Click the capture button to simulate flows.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 3: DETECTION ENGINE -->
+      <!-- ========================================== -->
+      <section id="tab-detection" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Detection Engine</h1>
+          <p class="page-description">Train and test 1D-CNN and Autoencoder neural models</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+          <!-- 1D-CNN Model Training -->
+          <div class="glass-panel">
+            <h3>1D-CNN Classifier (Supervised)</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Trains a convolutional model on labeled attacks to classify known threats.</p>
+            
+            <div class="training-box" id="cnn-training-box">
+              <div class="form-group">
+                <label class="form-label" for="input-cnn-epochs">CNN Epochs</label>
+                <input type="number" id="input-cnn-epochs" class="form-input" value="5" min="2" max="20">
+              </div>
+              <button id="btn-train-cnn" class="btn" style="width:100%;"><i class="fa-solid fa-bolt"></i> Train CNN Classifier</button>
+              
+              <div id="cnn-progress-section" style="display:none; margin-top:20px;">
+                <div class="status-text">
+                  <span id="cnn-status-label">Training model...</span>
+                  <span id="cnn-progress-percent">0%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div id="cnn-progress-fill" class="progress-fill"></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="cnn-results-box" class="glass-panel" style="display:none; border:none; padding:0;">
+              <h4 style="color:var(--success); font-weight:600; margin-bottom:12px;"><i class="fa-solid fa-circle-check"></i> CNN Model Trained Successfully!</h4>
+              <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                <span>Test Accuracy:</span>
+                <strong id="cnn-accuracy-text" style="color:#fff;">0.00%</strong>
+              </div>
+              <!-- Confusion matrix container -->
+              <h5 style="font-size:12px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Evaluation Matrix</h5>
+              <div id="cnn-matrix-chart-container" style="height: 200px; position:relative;">
+                <canvas id="cnn-matrix-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Autoencoder Model Training -->
+          <div class="glass-panel">
+            <h3>Autoencoder Anomaly Detector (Unsupervised)</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Learns normal benign characteristics and flags high reconstruction errors as zero-day anomalies.</p>
+            
+            <div class="training-box" id="ae-training-box">
+              <div class="form-group">
+                <label class="form-label" for="input-ae-epochs">Autoencoder Epochs</label>
+                <input type="number" id="input-ae-epochs" class="form-input" value="10" min="5" max="30">
+              </div>
+              <button id="btn-train-ae" class="btn" style="width:100%;"><i class="fa-solid fa-bolt"></i> Train Autoencoder</button>
+              
+              <div id="ae-progress-section" style="display:none; margin-top:20px;">
+                <div class="status-text">
+                  <span id="ae-status-label">Training model...</span>
+                  <span id="ae-progress-percent">0%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div id="ae-progress-fill" class="progress-fill"></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="ae-results-box" class="glass-panel" style="display:none; border:none; padding:0;">
+              <h4 style="color:var(--success); font-weight:600; margin-bottom:12px;"><i class="fa-solid fa-circle-check"></i> Autoencoder Trained!</h4>
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span>Anomaly Threshold:</span>
+                <strong id="ae-threshold-text" style="color:#fff;">0.0000</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                <span>Zero-Day Detection Rate:</span>
+                <strong id="ae-rate-text" style="color:#fff;">0.00%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Robustness Testing -->
+        <div class="glass-panel" style="margin-top:30px;">
+          <h3>Engine Robustness & Defenses</h3>
+          <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Evaluate the model's performance under simulated adversarial evasion and data poisoning attacks.</p>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+            <!-- Adversarial Attacks -->
+            <div class="glass-panel" style="background:rgba(0,0,0,0.15);">
+              <h4>Adversarial Attacks (Evasion)</h4>
+              <div class="form-group" style="margin-top:12px;">
+                <label class="form-label" for="select-adv-method">Attack Method</label>
+                <select id="select-adv-method" class="form-select">
+                  <option value="FGSM">FGSM (Fast Gradient Sign Method)</option>
+                  <option value="PGD">PGD (Projected Gradient Descent)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="input-adv-epsilon">Perturbation (Epsilon ε)</label>
+                <input type="number" id="input-adv-epsilon" class="form-input" value="0.1" min="0.01" max="0.5" step="0.01">
+              </div>
+              <button id="btn-run-adversarial" class="btn btn-danger" style="width:100%;"><i class="fa-solid fa-shield-virus"></i> Launch Adversarial Test</button>
+              
+              <div id="adversarial-results" style="margin-top:15px; display:none;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span>Original Accuracy:</span>
+                  <strong id="adv-orig-acc" style="color:#fff;">0.0%</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span>Adversarial Accuracy:</span>
+                  <strong id="adv-pois-acc" style="color:var(--danger);">0.0%</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span>Accuracy Drop:</span>
+                  <strong id="adv-drop-acc" style="color:var(--danger);">-0.0%</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Poison Attacks -->
+            <div class="glass-panel" style="background:rgba(0,0,0,0.15);">
+              <h4>Dataset Poisoning (Label Flipping)</h4>
+              <div class="form-group" style="margin-top:12px;">
+                <label class="form-label" for="select-poison-src">Flip Class</label>
+                <select id="select-poison-src" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="select-poison-tgt">Target Class</label>
+                <select id="select-poison-tgt" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="input-poison-rate">Poison Contamination Rate</label>
+                <input type="number" id="input-poison-rate" class="form-input" value="0.2" min="0.05" max="0.5" step="0.05">
+              </div>
+              <button id="btn-run-poison" class="btn btn-danger" style="width:100%;"><i class="fa-solid fa-skull-crossbones"></i> Run Poisoning Isolation Defense</button>
+              
+              <div id="poison-results" style="margin-top:15px; display:none;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span>Poisoned Samples Injected:</span>
+                  <strong id="poison-injected" style="color:#fff;">0</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span>Mitigated/Detected Poisoned:</span>
+                  <strong id="poison-detected" style="color:var(--success);">0</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span>Defense Detection Rate:</span>
+                  <strong id="poison-rate-pct" style="color:var(--success);">0.0%</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 4: TRAFFIC FILTERING -->
+      <!-- ========================================== -->
+      <section id="tab-filtering" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Traffic Filtering & Response</h1>
+          <p class="page-description">Examine decisions taken by the multi-model filtering engine (Stage 6)</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:30px;">
+          <!-- Left: Statistics -->
+          <div class="glass-panel">
+            <h3>Filtering Decisions Statistics</h3>
+            <div style="margin:25px 0;">
+              <div style="height:250px; position:relative;">
+                <canvas id="filter-stats-chart"></canvas>
+              </div>
+            </div>
+            <div id="filter-rates-info">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Right: Decisions List -->
+          <div class="glass-panel">
+            <h3>Filtering Decisions History</h3>
+            <div class="table-wrapper" style="max-height:480px; overflow-y:auto;">
+              <table class="custom-table" id="filtering-decisions-table">
+                <thead>
+                  <tr>
+                    <th>Flow ID</th>
+                    <th>Time</th>
+                    <th>Source IP</th>
+                    <th>Action</th>
+                    <th>CNN Prediction</th>
+                    <th>Anomaly</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="7" style="text-align:center; color:var(--text-dim);">No traffic filtered yet. Run a pipeline batch to generate decisions.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 5: FEDERATED LEARNING -->
+      <!-- ========================================== -->
+      <section id="tab-federated" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Federated Learning</h1>
+          <p class="page-description">Simulate secure, privacy-preserving multi-node collaborative learning (Stage 5)</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:30px;">
+          <!-- Config Box -->
+          <div class="glass-panel">
+            <h3>Collaborative Simulation</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Aggregates local model updates from edge nodes via FedAvg secure algorithms.</p>
+            
+            <div class="form-group">
+              <label class="form-label" for="select-fl-rounds">Federated Learning Rounds</label>
+              <select id="select-fl-rounds" class="form-select">
+                <option value="2">2 Rounds</option>
+                <option value="3" selected>3 Rounds</option>
+                <option value="5">5 Rounds</option>
+                <option value="8">8 Rounds</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="select-fl-clients">Simulated Edge Clients</label>
+              <select id="select-fl-clients" class="form-select">
+                <option value="2">2 Edge Nodes</option>
+                <option value="4" selected>4 Edge Nodes</option>
+                <option value="6">6 Edge Nodes</option>
+                <option value="8">8 Edge Nodes</option>
+              </select>
+            </div>
+
+            <button id="btn-run-fl" class="btn" style="width:100%;"><i class="fa-solid fa-users-gear"></i> Run Collaborative Training</button>
+          </div>
+
+          <!-- Charts -->
+          <div class="glass-panel">
+            <h3>Global Model Convergence</h3>
+            <div class="chart-container" style="height:320px; position:relative; margin-top:15px;">
+              <canvas id="fl-convergence-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 6: LOG ANALYSIS & THREAT INTEL -->
+      <!-- ========================================== -->
+      <section id="tab-logs" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Log Analysis & Threat Intelligence</h1>
+          <p class="page-description">IP reputations, pattern correlation, extracted IOCs, and explanations (Stage 7)</p>
+        </div>
+
+        <!-- Threat Intelligence Overview Card -->
+        <div class="glass-panel" style="margin-bottom:30px;">
+          <h3>Threat Intelligence Summary</h3>
+          <div id="intel-narrative-box" style="margin: 15px 0; font-size:14px; line-height:1.5; color:#c7d2fe;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+          <!-- Left: IP Reputation Scoring -->
+          <div class="glass-panel">
+            <h3>IP Reputation Tracking</h3>
+            <div class="table-wrapper" style="max-height:350px;">
+              <table class="custom-table" id="ip-reputation-table">
+                <thead>
+                  <tr>
+                    <th>IP Address</th>
+                    <th>Score</th>
+                    <th>Rating</th>
+                    <th>Flows</th>
+                    <th>Attacks</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Attack Chain Patterns -->
+          <div class="glass-panel">
+            <h3>Multi-stage Attack Correlator</h3>
+            <div class="table-wrapper" style="max-height:350px;">
+              <table class="custom-table" id="attack-patterns-table">
+                <thead>
+                  <tr>
+                    <th>Chain Pattern</th>
+                    <th>Matched Stages</th>
+                    <th>Risk Rating</th>
+                    <th>Source IP</th>
+                    <th>Trigger Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Threat explanation using explainer -->
+        <div class="glass-panel" style="margin-top:30px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3>QwenCoder Threat Explainer</h3>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <label for="select-explain-attack" style="font-size:12px; color:var(--text-muted);">Explain Class</label>
+              <select id="select-explain-attack" class="form-select" style="width:200px; padding:6px 12px;"></select>
+              <button id="btn-explain-attack" class="btn" style="padding:6px 15px;"><i class="fa-solid fa-terminal"></i> Analyze</button>
+            </div>
+          </div>
+          <div class="explainer-report" id="explainer-content">Select an attack class and click Analyze to view structured machine-generated mitigations, vectors, and details.</div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 7: ALERTS CENTER -->
+      <!-- ========================================== -->
+      <section id="tab-alerts" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Alerts Center</h1>
+          <p class="page-description">Aggregated threat notifications and simulated alert dispatch preferences (Stage 8)</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:30px;">
+          <!-- Notification Preferences & Actions -->
+          <div class="glass-panel">
+            <h3>Notification Configuration</h3>
+            
+            <div style="margin-top:20px;">
+              <h4 style="font-size:13px; font-weight:600; color:#fff; margin-bottom:12px;">Alert Action Controls</h4>
+              <div class="btn-group" style="width:100%; margin-bottom:20px;">
+                <button id="btn-ack-all" class="btn btn-secondary" style="flex:1;"><i class="fa-solid fa-check-double"></i> Acknowledge All</button>
+                <button id="btn-resolve-all" class="btn btn-secondary" style="flex:1;"><i class="fa-solid fa-circle-check"></i> Resolve All</button>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-color); padding-top:20px;">
+              <h4 style="font-size:13px; font-weight:600; color:#fff; margin-bottom:12px;">Dispatch Channels Toggles</h4>
+              <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="pref-email-enabled" checked>
+                <label for="pref-email-enabled" style="font-size:13px; color:var(--text-muted);">Enable Simulated Email Alerts</label>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pref-email-threshold">Email Threshold</label>
+                <select id="pref-email-threshold" class="form-select">
+                  <option value="INFO">INFO</option>
+                  <option value="WARNING">WARNING</option>
+                  <option value="CRITICAL" selected>CRITICAL</option>
+                  <option value="EMERGENCY">EMERGENCY</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
+                <input type="checkbox" id="pref-sms-enabled" checked>
+                <label for="pref-sms-enabled" style="font-size:13px; color:var(--text-muted);">Enable Simulated SMS Alerts</label>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pref-sms-threshold">SMS Threshold</label>
+                <select id="pref-sms-threshold" class="form-select">
+                  <option value="INFO">INFO</option>
+                  <option value="WARNING">WARNING</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                  <option value="EMERGENCY" selected>EMERGENCY</option>
+                </select>
+              </div>
+              <button id="btn-save-pref" class="btn" style="width:100%;"><i class="fa-solid fa-floppy-disk"></i> Save Preferences</button>
+            </div>
+          </div>
+
+          <!-- Alerts Timeline and Log -->
+          <div class="glass-panel">
+            <div class="dashboard-title-row">
+              <h3>Incident Response Log</h3>
+              <div style="display:flex; gap:10px;">
+                <select id="select-alert-filter-status" class="form-select" style="width:140px; padding:6px 12px;">
+                  <option value="">All Statuses</option>
+                  <option value="ACTIVE" selected>ACTIVE</option>
+                  <option value="ACKNOWLEDGED">ACKNOWLEDGED</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="chart-container" style="height:150px; position:relative; margin-bottom:20px;">
+              <canvas id="alerts-timeline-chart"></canvas>
+            </div>
+
+            <div id="alerts-container-list" style="max-height:300px; overflow-y:auto; padding-right:5px;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 8: REPORTS & ANALYTICS -->
+      <!-- ========================================== -->
+      <section id="tab-reports" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Reports & Analytics</h1>
+          <p class="page-description">Generate comprehensive audit summaries and export data logs (Stage 9)</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+          <!-- Export Data Panel -->
+          <div class="glass-panel">
+            <h3>Export System Datasets</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:25px;">Export captures, logs, and filter decisions to CSV or JSON formats for offline SIEM correlation audits.</p>
+            
+            <div style="display:flex; flex-direction:column; gap:15px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid var(--border-color);">
+                <div>
+                  <h4 style="font-size:14px; font-weight:600;">System Event Logs</h4>
+                  <p style="font-size:11px; color:var(--text-muted);">Includes all training, classification, and block events.</p>
+                </div>
+                <div class="btn-group">
+                  <a href="/api/logs/export/json" class="btn btn-secondary" style="padding: 8px 12px;"><i class="fa-solid fa-file-code"></i> JSON</a>
+                  <a href="/api/logs/export/csv" class="btn btn-secondary" style="padding: 8px 12px;"><i class="fa-solid fa-file-csv"></i> CSV</a>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid var(--border-color);">
+                <div>
+                  <h4 style="font-size:14px; font-weight:600;">Alert Notifications Log</h4>
+                  <p style="font-size:11px; color:var(--text-muted);">Includes alert triggers, thresholds, and times.</p>
+                </div>
+                <a href="/api/alerts/export/csv" class="btn btn-secondary" style="padding: 8px 12px;"><i class="fa-solid fa-file-csv"></i> Export CSV</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline Execution History -->
+          <div class="glass-panel">
+            <h3>Pipeline Executions Log</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">History of "Run Full Pipeline" executions in this session.</p>
+            <div class="table-wrapper" style="max-height:300px; overflow-y:auto;">
+              <table class="custom-table" id="pipeline-history-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Environment</th>
+                    <th>Total Flows</th>
+                    <th>Threats</th>
+                    <th>Execution Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5" style="text-align:center; color:var(--text-dim);">No execution history recorded in this session.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Javascript File -->
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
