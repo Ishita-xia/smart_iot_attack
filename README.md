@@ -1,10 +1,10 @@
-# 🛡️ Smart IDS — Intrusion Detection System for IoT Networks
+# Smart IDS — Intrusion Detection System for IoT Networks
 
 > A machine learning-based Intrusion Detection System that detects and blocks **34 types of cyberattacks** on IoT networks in real time using a **1D-CNN classifier** and **Autoencoder anomaly detector**, served through a full web dashboard.
 
 ---
 
-## 📌 Problem Statement
+## Problem Statement
 
 IoT devices (smart cameras, thermostats, medical monitors, industrial controllers) are everywhere but have **no built-in security**. They run 24/7, are rarely updated, and are easy targets for hackers.
 
@@ -14,7 +14,7 @@ Traditional firewalls use **fixed rules** — they only catch known attacks. New
 
 ---
 
-## ✅ Our Solution
+## Our Solution
 
 Two machine learning models working together:
 
@@ -27,20 +27,20 @@ The CNN identifies **what** the attack is. The Autoencoder catches **anything th
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
-- 📤 **Upload your own CSV** — analyzed through the full 9-stage pipeline instantly
-- 🧠 **Pre-trained models** — no setup needed, works out of the box
-- 🔍 **34 attack classes** detected — DDoS, DoS, Malware, Recon, Web Attacks, Spoofing, Brute Force
-- ⚠️ **Zero-day detection** via Autoencoder anomaly scoring
-- 🌐 **Federated Learning** — privacy-preserving multi-node training simulation
-- 🛡️ **Adversarial robustness testing** — FGSM and PGD attack simulation
-- 📊 **Real-time dashboard** — alerts, logs, threat intelligence, IP reputation
-- 📁 **Export** logs and alerts to CSV/JSON
+- **Upload your own CSV** — analyzed through the full 9-stage pipeline instantly
+- **Pre-trained models** — no setup needed, works out of the box
+- **34 attack classes** detected — DDoS, DoS, Malware, Recon, Web Attacks, Spoofing, Brute Force
+- **Zero-day detection** via Autoencoder anomaly scoring
+- **Federated Learning** — privacy-preserving multi-node training simulation
+- **Adversarial robustness testing** — FGSM and PGD attack simulation
+- **Real-time dashboard** — alerts, logs, threat intelligence, IP reputation
+- **Export** logs and alerts to CSV/JSON
 
 ---
 
-## 📊 Model Performance
+## Model Performance
 
 | Metric | Value |
 |---|---|
@@ -50,7 +50,7 @@ The CNN identifies **what** the attack is. The Autoencoder catches **anything th
 | Test Samples | 32,116 |
 | Attack Classes | 34 |
 
-> Random guessing baseline = 2.94%. Our model is **23× better than random**.
+> Random guessing baseline = 2.94%. Our model is **23x better than random**.
 
 **Top performing classes:**
 
@@ -65,71 +65,71 @@ The CNN identifies **what** the attack is. The Autoencoder catches **anything th
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 User Uploads CSV
-      ↓
-Stage 1 → IoT Network Simulation
-Stage 2 → Traffic Capture
-Stage 3 → Preprocessing & Normalization (StandardScaler)
-Stage 4 → Detection Engine (CNN + Autoencoder)
-Stage 5 → Federated Learning (FedAvg)
-Stage 6 → Traffic Filtering (ALLOW / BLOCK / RATE_LIMIT / TERMINATE)
-Stage 7 → Log Analysis & Threat Intelligence
-Stage 8 → Alerts & Notifications
-Stage 9 → Admin Dashboard
+      |
+Stage 1 -> IoT Network Simulation
+Stage 2 -> Traffic Capture
+Stage 3 -> Preprocessing & Normalization (StandardScaler)
+Stage 4 -> Detection Engine (CNN + Autoencoder)
+Stage 5 -> Federated Learning (FedAvg)
+Stage 6 -> Traffic Filtering (ALLOW / BLOCK / RATE_LIMIT / TERMINATE)
+Stage 7 -> Log Analysis & Threat Intelligence
+Stage 8 -> Alerts & Notifications
+Stage 9 -> Admin Dashboard
 ```
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-├── main.py                          # Quick CLI trainer
-├── SMART_IDS_COMPLETE_GUIDE.txt     # Full project documentation
-│
-└── iot_security/
-    ├── app.py                       # Flask server + all API routes
-    ├── data_loader.py               # Dataset loading & preprocessing
-    ├── pipeline.py                  # 9-stage pipeline orchestrator
-    ├── traffic_simulator.py         # IoT environment simulation
-    ├── traffic_filter.py            # ALLOW/BLOCK decision engine
-    ├── alert_system.py              # Alert management
-    ├── log_manager.py               # Event logging
-    ├── threat_intelligence.py       # IP reputation + IOC engine
-    ├── qwen_explainer.py            # Attack narrative generator
-    ├── train_and_save.py            # Offline training script
-    │
-    ├── models/
-    │   ├── cnn_model.py             # 1D-CNN architecture
-    │   ├── autoencoder.py           # Autoencoder architecture
-    │   ├── federated_learning.py    # FedAvg simulation
-    │   └── incremental_learning.py  # EWC continual learning
-    │
-    ├── attacks/
-    │   ├── adversarial_attack.py    # FGSM + PGD attacks
-    │   └── poison_attack.py         # Label flip + Isolation Forest
-    │
-    ├── saved_models/
-    │   ├── cnn_model.pth            # Trained CNN weights
-    │   ├── autoencoder.pth          # Trained Autoencoder weights
-    │   ├── scaler.pkl               # Fitted StandardScaler
-    │   ├── label_encoder.pkl        # LabelEncoder (34 classes)
-    │   ├── ae_threshold.pkl         # Anomaly threshold = 0.0671
-    │   └── training_meta.json       # Accuracy metrics & history
-    │
-    ├── templates/
-    │   └── dashboard.html           # Single page web app
-    │
-    └── static/
-        ├── css/style.css            # Glassmorphism dark theme
-        └── js/dashboard.js          # Frontend logic & charts
+|-- main.py                          # Quick CLI trainer
+|-- SMART_IDS_COMPLETE_GUIDE.txt     # Full project documentation
+|
++-- iot_security/
+    |-- app.py                       # Flask server + all API routes
+    |-- data_loader.py               # Dataset loading & preprocessing
+    |-- pipeline.py                  # 9-stage pipeline orchestrator
+    |-- traffic_simulator.py         # IoT environment simulation
+    |-- traffic_filter.py            # ALLOW/BLOCK decision engine
+    |-- alert_system.py              # Alert management
+    |-- log_manager.py               # Event logging
+    |-- threat_intelligence.py       # IP reputation + IOC engine
+    |-- qwen_explainer.py            # Attack narrative generator
+    |-- train_and_save.py            # Offline training script
+    |
+    +-- models/
+    |   |-- cnn_model.py             # 1D-CNN architecture
+    |   |-- autoencoder.py           # Autoencoder architecture
+    |   |-- federated_learning.py    # FedAvg simulation
+    |   +-- incremental_learning.py  # EWC continual learning
+    |
+    +-- attacks/
+    |   |-- adversarial_attack.py    # FGSM + PGD attacks
+    |   +-- poison_attack.py         # Label flip + Isolation Forest
+    |
+    +-- saved_models/
+    |   |-- cnn_model.pth            # Trained CNN weights
+    |   |-- autoencoder.pth          # Trained Autoencoder weights
+    |   |-- scaler.pkl               # Fitted StandardScaler
+    |   |-- label_encoder.pkl        # LabelEncoder (34 classes)
+    |   |-- ae_threshold.pkl         # Anomaly threshold = 0.0671
+    |   +-- training_meta.json       # Accuracy metrics & history
+    |
+    +-- templates/
+    |   +-- dashboard.html           # Single page web app
+    |
+    +-- static/
+        |-- css/style.css            # Glassmorphism dark theme
+        +-- js/dashboard.js          # Frontend logic & charts
 ```
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
 **1. Install dependencies**
 ```bash
@@ -151,22 +151,22 @@ Pre-trained models load automatically on startup — no training needed.
 
 ---
 
-## 🔁 How to Retrain Models (Optional)
+## How to Retrain Models (Optional)
 
 ```bash
 cd iot_security
 python train_and_save.py
 ```
 
-This reads all dataset CSVs, trains CNN + Autoencoder, and saves all model files to `saved_models/`. Takes ~2-3 minutes on CPU.
+This reads all dataset CSVs, trains CNN + Autoencoder, and saves all model files to `saved_models/`. Takes approximately 2-3 minutes on CPU.
 
 ---
 
-## 📤 Using the Upload Feature
+## Using the Upload Feature
 
 1. Open the dashboard at `http://127.0.0.1:5000`
 2. The **Upload panel is the first thing you see** at the top
-3. Drag & drop any CSV with IoT network flow features
+3. Drag and drop any CSV with IoT network flow features
 4. Click **"Analyze Traffic"**
 5. Results appear instantly:
    - Total flows / Benign / Attacks / Anomalies
@@ -176,7 +176,7 @@ This reads all dataset CSVs, trains CNN + Autoencoder, and saves all model files
 
 ---
 
-## 🗃️ Dataset
+## Dataset
 
 **CIC-IoT-2023** — Canadian Institute for Cybersecurity
 
@@ -195,7 +195,7 @@ This reads all dataset CSVs, trains CNN + Autoencoder, and saves all model files
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -208,9 +208,9 @@ This reads all dataset CSVs, trains CNN + Autoencoder, and saves all model files
 
 ---
 
-## 🔬 Research Features
+## Research Features
 
-- **Adversarial Testing** — FGSM & PGD evasion attacks on the CNN
+- **Adversarial Testing** — FGSM and PGD evasion attacks on the CNN
 - **Poisoning Defense** — Label flip attack + Isolation Forest detection
 - **Federated Learning** — FedAvg across 2-8 simulated edge nodes
 - **Threat Intelligence** — IP reputation scoring, attack chain correlation
@@ -218,12 +218,12 @@ This reads all dataset CSVs, trains CNN + Autoencoder, and saves all model files
 
 ---
 
-## 📄 Documentation
+## Documentation
 
-See [`SMART_IDS_COMPLETE_GUIDE.txt`](./SMART_IDS_COMPLETE_GUIDE.txt) for the full project documentation including problem statement, model architecture, pipeline explanation, and interview preparation guide.
+See [SMART_IDS_COMPLETE_GUIDE.txt](./SMART_IDS_COMPLETE_GUIDE.txt) for the full project documentation including problem statement, model architecture, pipeline explanation, and interview preparation guide.
 
 ---
 
-## 👩‍💻 Author
+## Author
 
 Final Year Project — IoT Network Security using Machine Learning
